@@ -67,6 +67,7 @@ npm run dev
 | GET | `/api/words/random` | 随机获取一条词条 |
 | GET | `/api/words/:id` | 词条详情 |
 | POST | `/api/words` | 新增词条 |
+| POST | `/api/words/batch-delete` | 批量删除词条 |
 | PUT | `/api/words/:id` | 更新词条 |
 | DELETE | `/api/words/:id` | 删除词条 |
 | GET | `/api/regions` | 地区列表（去重） |
@@ -124,6 +125,40 @@ npm run dev
   ]
 }
 ```
+
+### 批量删除词条接口
+
+**路径**：`POST /api/words/batch-delete`
+
+接收词条编号数组，一次性删除多条记录，返回实际删除成功的条数。
+
+**请求参数**：
+
+| 字段 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `ids` | `array` | 是 | 要删除的词条编号数组，如 `[1, 2, 3]` |
+
+**返回字段**：
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| `deleted_count` | `number` | 实际删除成功的词条数量 |
+
+请求示例：
+```json
+{
+  "ids": [1, 2, 3]
+}
+```
+
+响应示例：
+```json
+{
+  "deleted_count": 3
+}
+```
+
+> 如果传入的编号不存在或无效，`deleted_count` 会返回实际成功删除的条数。
 
 ## 页面入口
 

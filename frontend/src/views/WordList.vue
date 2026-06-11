@@ -41,21 +41,21 @@
     </template>
 
     <el-table
+      ref="tableRef"
       v-loading="loading"
       :data="words"
       stripe
       style="width: 100%"
-      @row-click="handleRowClick"
       @selection-change="handleSelectionChange"
     >
-      <el-table-column type="selection" width="55" />
-      <el-table-column prop="dialect_word" label="方言词" width="120" />
-      <el-table-column prop="mandarin" label="普通话" width="120" />
-      <el-table-column prop="region" label="地区" width="100" />
+      <el-table-column type="selection" width="50" />
+      <el-table-column prop="dialect_word" label="方言词" width="110" />
+      <el-table-column prop="mandarin" label="普通话" width="110" />
+      <el-table-column prop="region" label="地区" width="90" />
       <el-table-column prop="example" label="例句" show-overflow-tooltip />
-      <el-table-column prop="source" label="来源" width="160" show-overflow-tooltip />
-      <el-table-column prop="remark" label="备注" width="200" show-overflow-tooltip />
-      <el-table-column label="操作" width="160" fixed="right">
+      <el-table-column prop="source" label="来源" width="140" show-overflow-tooltip />
+      <el-table-column prop="remark" label="备注" width="160" show-overflow-tooltip />
+      <el-table-column label="操作" width="140" fixed="right">
         <template #default="{ row }">
           <el-button type="primary" link @click.stop="goDetail(row.id)">编辑</el-button>
           <el-button type="danger" link @click.stop="handleDelete(row.id)">删除</el-button>
@@ -73,10 +73,12 @@ import { Delete, Refresh, Search } from '@element-plus/icons-vue'
 import { batchDeleteWords, deleteWord, fetchRegions, fetchWords, searchWords } from '@/api/words'
 import { useRegionStore } from '@/stores/region'
 import type { DialectWord, WordQueryParams } from '@/types/word'
+import type { ElTable } from 'element-plus'
 
 const router = useRouter()
 const regionStore = useRegionStore()
 
+const tableRef = ref<InstanceType<typeof ElTable>>()
 const loading = ref(false)
 const words = ref<DialectWord[]>([])
 const regions = ref<string[]>([])
@@ -126,8 +128,8 @@ function goDetail(id: number) {
   router.push(`/words/${id}`)
 }
 
-function handleRowClick(row: DialectWord) {
-  goDetail(row.id)
+function clearSelection() {
+  tableRef.value?.clearSelection()
 }
 
 async function handleDelete(id: number) {
@@ -157,13 +159,14 @@ async function handleBatchDelete() {
     )
     const result = await batchDeleteWords(selectedIds.value)
     ElMessage.success(`成功删除 ${result.deleted_count} 条词条`)
-    selectedIds.value = []
+    clearSelection()
     await loadWords()
     await loadRegions()
   } catch (error) {
     if (error !== 'cancel') {
       ElMessage.error('批量删除失败')
     }
+    clearSelection()
   }
 }
 
@@ -186,7 +189,5 @@ onMounted(async () => {
   gap: 8px;
 }
 
-:deep(.el-table__row) {
-  cursor: pointer;
-}
+
 </style>
