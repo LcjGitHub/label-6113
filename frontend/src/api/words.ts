@@ -1,5 +1,5 @@
 import axios from 'axios'
-import type { BatchDeleteResult, DialectWord, Region, WordForm } from '@/types/word'
+import type { BatchDeleteResult, DialectWord, RegionStat, WordForm } from '@/types/word'
 
 const api = axios.create({
   baseURL: '/api',
