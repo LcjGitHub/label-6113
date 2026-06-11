@@ -19,3 +19,13 @@ export interface WordQueryParams {
   region?: string
   keyword?: string
 }
+
+export interface RegionStat {
+  region: string
+  count: number
+}
+
+export interface RegionStatsResponse {
+  total: number
+  regions: RegionStat[]
+}

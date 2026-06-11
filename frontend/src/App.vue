@@ -3,9 +3,14 @@
     <el-header class="app-header">
       <div class="header-inner">
         <h1 class="title" @click="router.push('/')">方言词汇库</h1>
-        <el-button type="primary" :icon="Plus" @click="router.push('/words/new')">
-          新增词条
-        </el-button>
+        <div class="nav-actions">
+          <el-button :icon="DataLine" @click="router.push('/stats')">
+            数据统计
+          </el-button>
+          <el-button type="primary" :icon="Plus" @click="router.push('/words/new')">
+            新增词条
+          </el-button>
+        </div>
       </div>
     </el-header>
     <el-main class="app-main">
@@ -15,7 +20,7 @@
 </template>
 
 <script setup lang="ts">
-import { Plus } from '@element-plus/icons-vue'
+import { DataLine, Plus } from '@element-plus/icons-vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
@@ -50,6 +55,11 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+
+.nav-actions {
+  display: flex;
+  gap: 8px;
 }
 
 .title {

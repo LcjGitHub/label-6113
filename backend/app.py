@@ -111,6 +111,28 @@ def list_regions():
     return jsonify([row[0] for row in rows])
 
 
+@app.route("/api/stats/region", methods=["GET"])
+def region_stats():
+    stats = (
+        db.session.query(
+            DialectWord.region,
+            db.func.count(DialectWord.id).label("count"),
+        )
+        .group_by(DialectWord.region)
+        .order_by(db.desc("count"))
+        .all()
+    )
+    total = db.session.query(db.func.count(DialectWord.id)).scalar() or 0
+    return jsonify(
+        {
+            "total": total,
+            "regions": [
+                {"region": row.region, "count": row.count} for row in stats
+            ],
+        }
+    )
+
+
 def _validate_word_data(data):
     required = ("dialect_word", "mandarin", "region")
     for field in required:
