@@ -70,9 +70,9 @@ import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Delete, Refresh, Search } from '@element-plus/icons-vue'
-import { batchDeleteWords, deleteWord, fetchRegions, fetchWords, searchWords } from '@/api/words'
+import { batchDeleteWords, deleteWord, fetchRegions, fetchWords } from '@/api/words'
 import { useRegionStore } from '@/stores/region'
-import type { DialectWord, WordQueryParams } from '@/types/word'
+import type { DialectWord } from '@/types/word'
 import type { ElTable } from 'element-plus'
 
 const router = useRouter()
@@ -89,13 +89,8 @@ async function loadWords() {
   loading.value = true
   try {
     const region = regionStore.selectedRegion || undefined
-    if (keyword.value.trim()) {
-      const params: WordQueryParams = { keyword: keyword.value.trim() }
-      if (region) params.region = region
-      words.value = await searchWords(params)
-    } else {
-      words.value = await fetchWords(region)
-    }
+    const kw = keyword.value.trim() || undefined
+    words.value = await fetchWords(region, kw)
   } catch {
     ElMessage.error('加载词汇列表失败')
   } finally {

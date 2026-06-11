@@ -21,9 +21,18 @@ CORS(app)
 @app.route("/api/words", methods=["GET"])
 def list_words():
     region = request.args.get("region", "").strip()
+    keyword = request.args.get("keyword", "").strip()
     query = DialectWord.query
     if region:
         query = query.filter(DialectWord.region == region)
+    if keyword:
+        like_pattern = f"%{keyword}%"
+        query = query.filter(
+            db.or_(
+                DialectWord.dialect_word.like(like_pattern),
+                DialectWord.mandarin.like(like_pattern),
+            )
+        )
     words = query.order_by(DialectWord.id).all()
     return jsonify([word.to_dict() for word in words])
 
