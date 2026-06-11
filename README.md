@@ -64,7 +64,7 @@ npm run dev
 | 方法 | 路径 | 说明 |
 |------|------|------|
 | GET | `/api/words` | 词条列表，支持 `?region=四川` 按地区筛选、`?keyword=巴适` 关键词模糊匹配（方言词、普通话或拼音），两个参数可单独或组合使用 |
-| GET | `/api/words/random` | 随机获取一条词条 |
+| GET | `/api/words/random` | 随机获取一条词条，支持 `?region=四川` 按地区随机 |
 | GET | `/api/words/:id` | 词条详情 |
 | POST | `/api/words` | 新增词条 |
 | POST | `/api/words/batch-delete` | 批量删除词条 |
@@ -103,7 +103,13 @@ GET /api/words?region=四川&keyword=巴适
 
 **路径**：`GET /api/words/random`
 
-从数据库中随机返回一条完整词条记录。
+从数据库中随机返回一条完整词条记录。支持按地区筛选，传入地区名时仅在该地区内随机返回一条，不传则全库随机。
+
+**查询参数**：
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `region` | `string` | 否 | 按地区精确筛选后随机，如 `四川` |
 
 **返回字段**：
 
@@ -117,6 +123,16 @@ GET /api/words?region=四川&keyword=巴适
 | `example` | `string` | 例句（可能为空字符串） |
 | `source` | `string` | 来源（可能为空字符串） |
 | `remark` | `string` | 备注（可能为空字符串） |
+
+**示例请求**：
+
+```
+# 全库随机
+GET /api/words/random
+
+# 按地区随机
+GET /api/words/random?region=四川
+```
 
 响应示例：
 ```json
@@ -133,6 +149,8 @@ GET /api/words?region=四川&keyword=巴适
 ```
 
 > 当数据库中无任何词条时，返回 `404` 状态码及 `{"error": "暂无词条数据"}`。
+>
+> 当指定地区下无词条时，返回 `404` 状态码及 `{"error": "暂无词条数据"}`。
 
 ### 按地区统计接口返回字段
 

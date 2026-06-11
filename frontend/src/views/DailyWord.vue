@@ -2,15 +2,7 @@
   <el-card shadow="never" class="daily-card">
     <template #header>
       <div class="card-header">
-        <div class="title-group">
-          <span class="header-title">每日一词</span>
-          <el-tag v-if="currentRegion" type="success" size="small" effect="light">
-            地区: {{ currentRegion }}
-          </el-tag>
-          <el-tag v-else type="info" size="small" effect="light">
-            全库随机
-          </el-tag>
-        </div>
+        <span class="header-title">每日一词</span>
         <el-button type="primary" :icon="RefreshRight" :loading="loading" @click="loadRandomWord">
           换一条
         </el-button>
@@ -50,7 +42,10 @@
         </div>
       </template>
 
-      <el-empty v-else-if="!loading && isEmpty" description="暂无词条数据" />
+      <el-empty
+        v-else-if="!loading && isEmpty"
+        :description="currentRegion ? '该地区暂无词条数据' : '暂无词条数据'"
+      />
     </div>
   </el-card>
 </template>
@@ -106,12 +101,6 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-}
-
-.title-group {
-  display: flex;
-  align-items: center;
-  gap: 10px;
 }
 
 .header-title {
