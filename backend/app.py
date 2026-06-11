@@ -107,6 +107,14 @@ def delete_word(word_id):
     return jsonify({"message": "删除成功"})
 
 
+@app.route("/api/words/random", methods=["GET"])
+def get_random_word():
+    word = DialectWord.query.order_by(db.func.random()).first()
+    if not word:
+        return jsonify({"error": "暂无词条数据"}), 404
+    return jsonify(word.to_dict())
+
+
 @app.route("/api/regions", methods=["GET"])
 def list_regions():
     rows = db.session.query(DialectWord.region).distinct().order_by(DialectWord.region).all()

@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import WordList from '@/views/WordList.vue'
 import WordDetail from '@/views/WordDetail.vue'
 import Stats from '@/views/Stats.vue'
+import DailyWord from '@/views/DailyWord.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -10,6 +11,11 @@ const router = createRouter({
       path: '/',
       name: 'word-list',
       component: WordList,
+    },
+    {
+      path: '/daily',
+      name: 'daily-word',
+      component: DailyWord,
     },
     {
       path: '/stats',

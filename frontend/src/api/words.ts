@@ -35,6 +35,11 @@ export async function deleteWord(id: number): Promise<void> {
   await api.delete(`/words/${id}`)
 }
 
+export async function fetchRandomWord(): Promise<DialectWord> {
+  const { data } = await api.get<DialectWord>('/words/random')
+  return data
+}
+
 export async function fetchRegions(): Promise<string[]> {
   const { data } = await api.get<string[]>('/regions')
   return data

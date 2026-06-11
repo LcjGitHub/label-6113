@@ -5,6 +5,13 @@
         <h1 class="title" @click="router.push('/')">方言词汇库</h1>
         <div class="nav-actions">
           <el-button
+            :icon="Star"
+            :type="isDailyPage ? 'warning' : 'default'"
+            @click="router.push('/daily')"
+          >
+            每日一词
+          </el-button>
+          <el-button
             :icon="DataLine"
             :type="isStatsPage ? 'success' : 'default'"
             @click="router.push('/stats')"
@@ -25,12 +32,13 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { DataLine, Plus } from '@element-plus/icons-vue'
+import { Star, DataLine, Plus } from '@element-plus/icons-vue'
 import { useRoute, useRouter } from 'vue-router'
 
 const router = useRouter()
 const route = useRoute()
 
+const isDailyPage = computed(() => route.name === 'daily-word')
 const isStatsPage = computed(() => route.name === 'stats')
 </script>
 
