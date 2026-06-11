@@ -63,7 +63,7 @@ npm run dev
 
 | 方法 | 路径 | 说明 |
 |------|------|------|
-| GET | `/api/words` | 词条列表，支持 `?region=四川` 筛选 |
+| GET | `/api/words` | 词条列表，支持 `?region=四川` 按地区筛选、`?keyword=巴适` 关键词模糊匹配（方言词或普通话），两个参数可单独或组合使用 |
 | GET | `/api/words/random` | 随机获取一条词条 |
 | GET | `/api/words/:id` | 词条详情 |
 | POST | `/api/words` | 新增词条 |
@@ -72,6 +72,32 @@ npm run dev
 | DELETE | `/api/words/:id` | 删除词条 |
 | GET | `/api/regions` | 地区列表（去重） |
 | GET | `/api/stats/region` | 按地区统计词条数量 |
+
+### 查询全部词条接口
+
+**路径**：`GET /api/words`
+
+返回所有词条，支持地区筛选与关键词搜索两个可选查询参数，两个参数可单独使用或任意组合。
+
+**查询参数**：
+
+| 参数 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `region` | `string` | 否 | 按地区精确筛选，如 `四川` |
+| `keyword` | `string` | 否 | 关键词模糊匹配，同时作用于「方言词」和「普通话」两个字段 |
+
+**示例请求**：
+
+```
+# 仅按地区筛选
+GET /api/words?region=四川
+
+# 仅关键词搜索
+GET /api/words?keyword=巴适
+
+# 地区 + 关键词组合
+GET /api/words?region=四川&keyword=巴适
+```
 
 ### 随机获取词条接口
 

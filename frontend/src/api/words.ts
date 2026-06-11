@@ -1,5 +1,5 @@
 import axios from 'axios'
-import type { BatchDeleteResult, DialectWord, WordForm, WordQueryParams } from '@/types/word'
+import type { BatchDeleteResult, DialectWord, WordForm } from '@/types/word'
 
 const api = axios.create({
   baseURL: '/api',
@@ -10,11 +10,6 @@ export async function fetchWords(region?: string, keyword?: string): Promise<Dia
   if (region) params.region = region
   if (keyword) params.keyword = keyword
   const { data } = await api.get<DialectWord[]>('/words', { params })
-  return data
-}
-
-export async function searchWords(params: WordQueryParams): Promise<DialectWord[]> {
-  const { data } = await api.get<DialectWord[]>('/words/search', { params })
   return data
 }
 

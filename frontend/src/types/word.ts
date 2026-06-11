@@ -17,11 +17,6 @@ export interface WordForm {
   remark: string
 }
 
-export interface WordQueryParams {
-  region?: string
-  keyword?: string
-}
-
 export interface RegionStat {
   region: string
   count: number

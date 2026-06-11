@@ -37,26 +37,6 @@ def list_words():
     return jsonify([word.to_dict() for word in words])
 
 
-@app.route("/api/words/search", methods=["GET"])
-def search_words():
-    keyword = request.args.get("keyword", "").strip()
-    region = request.args.get("region", "").strip()
-    if not keyword:
-        return jsonify({"error": "关键词不能为空"}), 400
-    query = DialectWord.query
-    like_pattern = f"%{keyword}%"
-    query = query.filter(
-        db.or_(
-            DialectWord.dialect_word.like(like_pattern),
-            DialectWord.mandarin.like(like_pattern),
-        )
-    )
-    if region:
-        query = query.filter(DialectWord.region == region)
-    words = query.order_by(DialectWord.id).all()
-    return jsonify([word.to_dict() for word in words])
-
-
 @app.route("/api/words/<int:word_id>", methods=["GET"])
 def get_word(word_id):
     word = db.session.get(DialectWord, word_id)
