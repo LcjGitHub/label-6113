@@ -43,7 +43,22 @@
         <el-input v-model="form.pinyin" placeholder="请输入拼音" />
       </el-form-item>
       <el-form-item label="地区" prop="region">
-        <el-input v-model="form.region" placeholder="如：四川、广东" />
+        <el-select
+          v-model="form.region"
+          placeholder="请选择或输入地区"
+          filterable
+          allow-create
+          default-first-option
+          clearable
+          style="width: 100%"
+        >
+          <el-option
+            v-for="item in regions"
+            :key="item.region"
+            :label="`${item.region}(${item.count})`"
+            :value="item.region"
+          />
+        </el-select>
       </el-form-item>
       <el-form-item label="例句" prop="example">
         <el-input
@@ -84,9 +99,9 @@ import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from 'element-plus'
 import { ArrowLeft, ArrowRight, Back } from '@element-plus/icons-vue'
-import { createWord, deleteWord, fetchAdjacentWords, fetchWord, updateWord } from '@/api/words'
+import { createWord, deleteWord, fetchAdjacentWords, fetchRegions, fetchWord, updateWord } from '@/api/words'
 import { useBrowserHistoryStore } from '@/stores/browserHistory'
-import type { AdjacentWords, WordForm } from '@/types/word'
+import type { AdjacentWords, Region, WordForm } from '@/types/word'
 
 const props = defineProps<{
   id?: string
@@ -100,6 +115,7 @@ const formRef = ref<FormInstance>()
 const loading = ref(false)
 const saving = ref(false)
 const deleting = ref(false)
+const regions = ref<Region[]>([])
 
 const adjacent = reactive<AdjacentWords>({
   prev: null,
@@ -213,7 +229,18 @@ async function handleDelete() {
   }
 }
 
-onMounted(loadWord)
+async function loadRegions() {
+  try {
+    regions.value = await fetchRegions()
+  } catch {
+    ElMessage.error('加载地区列表失败')
+  }
+}
+
+onMounted(() => {
+  loadWord()
+  loadRegions()
+})
 
 watch(() => props.id, () => {
   loadWord()
