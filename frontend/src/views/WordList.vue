@@ -45,8 +45,9 @@
       v-loading="loading"
       :data="words"
       stripe
-      style="width: 100%"
+      style="width: 100%; cursor: pointer"
       @selection-change="handleSelectionChange"
+      @row-click="handleRowClick"
     >
       <el-table-column type="selection" width="50" />
       <el-table-column prop="dialect_word" label="方言词" width="110" />
@@ -145,6 +146,11 @@ function handleSelectionChange(selection: DialectWord[]) {
   selectedIds.value = selection.map((item) => item.id)
 }
 
+function handleRowClick(row: DialectWord, column: any) {
+  if (column.type === 'selection' || column.label === '操作') return
+  goDetail(row.id)
+}
+
 async function handleBatchDelete() {
   try {
     await ElMessageBox.confirm(
@@ -160,8 +166,8 @@ async function handleBatchDelete() {
   } catch (error) {
     if (error !== 'cancel') {
       ElMessage.error('批量删除失败')
+      clearSelection()
     }
-    clearSelection()
   }
 }
 
