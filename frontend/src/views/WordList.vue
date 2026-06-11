@@ -44,6 +44,7 @@
       <el-table-column prop="region" label="地区" width="100" />
       <el-table-column prop="example" label="例句" show-overflow-tooltip />
       <el-table-column prop="source" label="来源" width="160" show-overflow-tooltip />
+      <el-table-column prop="remark" label="备注" width="200" show-overflow-tooltip />
       <el-table-column label="操作" width="160" fixed="right">
         <template #default="{ row }">
           <el-button type="primary" link @click.stop="goDetail(row.id)">编辑</el-button>

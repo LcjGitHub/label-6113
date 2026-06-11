@@ -69,6 +69,7 @@ def create_word():
         region=data["region"].strip(),
         example=(data.get("example") or "").strip(),
         source=(data.get("source") or "").strip(),
+        remark=(data.get("remark") or "").strip(),
     )
     db.session.add(word)
     db.session.commit()
@@ -91,6 +92,7 @@ def update_word(word_id):
     word.region = data["region"].strip()
     word.example = (data.get("example") or "").strip()
     word.source = (data.get("source") or "").strip()
+    word.remark = (data.get("remark") or "").strip()
     db.session.commit()
     return jsonify(word.to_dict())
 

@@ -12,6 +12,7 @@ class DialectWord(db.Model):
     region = db.Column(db.String(50), nullable=False)
     example = db.Column(db.Text, default="")
     source = db.Column(db.String(200), default="")
+    remark = db.Column(db.Text, default="")
 
     def to_dict(self):
         return {
@@ -21,4 +22,5 @@ class DialectWord(db.Model):
             "region": self.region,
             "example": self.example or "",
             "source": self.source or "",
+            "remark": self.remark or "",
         }

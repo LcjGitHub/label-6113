@@ -35,6 +35,14 @@
       <el-form-item label="来源" prop="source">
         <el-input v-model="form.source" placeholder="请输入来源" />
       </el-form-item>
+      <el-form-item label="备注" prop="remark">
+        <el-input
+          v-model="form.remark"
+          type="textarea"
+          :rows="3"
+          placeholder="请输入备注说明"
+        />
+      </el-form-item>
       <el-form-item>
         <el-button type="primary" :loading="saving" @click="handleSubmit">
           {{ isCreate ? '创建' : '保存' }}
@@ -73,6 +81,7 @@ const form = reactive<WordForm>({
   region: '',
   example: '',
   source: '',
+  remark: '',
 })
 
 const rules: FormRules<WordForm> = {
@@ -97,6 +106,7 @@ async function loadWord() {
       region: word.region,
       example: word.example,
       source: word.source,
+      remark: word.remark,
     })
   } catch {
     ElMessage.error('加载词条失败')
