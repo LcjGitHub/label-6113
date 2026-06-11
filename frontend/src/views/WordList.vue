@@ -51,6 +51,7 @@
       <el-table-column type="selection" width="50" />
       <el-table-column prop="dialect_word" label="方言词" width="110" />
       <el-table-column prop="mandarin" label="普通话" width="110" />
+      <el-table-column prop="pinyin" label="拼音" width="140" show-overflow-tooltip />
       <el-table-column prop="region" label="地区" width="90" />
       <el-table-column prop="example" label="例句" show-overflow-tooltip />
       <el-table-column prop="source" label="来源" width="140" show-overflow-tooltip />
@@ -73,12 +74,11 @@ import { Delete, Refresh, Search } from '@element-plus/icons-vue'
 import { batchDeleteWords, deleteWord, fetchRegions, fetchWords } from '@/api/words'
 import { useRegionStore } from '@/stores/region'
 import type { DialectWord, Region } from '@/types/word'
-import type { ElTable } from 'element-plus'
 
 const router = useRouter()
 const regionStore = useRegionStore()
 
-const tableRef = ref<InstanceType<typeof ElTable>>()
+const tableRef = ref<any>()
 const loading = ref(false)
 const words = ref<DialectWord[]>([])
 const regions = ref<Region[]>([])

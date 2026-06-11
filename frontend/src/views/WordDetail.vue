@@ -21,6 +21,9 @@
       <el-form-item label="普通话" prop="mandarin">
         <el-input v-model="form.mandarin" placeholder="请输入对应普通话" />
       </el-form-item>
+      <el-form-item label="拼音" prop="pinyin">
+        <el-input v-model="form.pinyin" placeholder="请输入拼音" />
+      </el-form-item>
       <el-form-item label="地区" prop="region">
         <el-input v-model="form.region" placeholder="如：四川、广东" />
       </el-form-item>
@@ -78,6 +81,7 @@ const deleting = ref(false)
 const form = reactive<WordForm>({
   dialect_word: '',
   mandarin: '',
+  pinyin: '',
   region: '',
   example: '',
   source: '',
@@ -103,6 +107,7 @@ async function loadWord() {
     Object.assign(form, {
       dialect_word: word.dialect_word,
       mandarin: word.mandarin,
+      pinyin: word.pinyin,
       region: word.region,
       example: word.example,
       source: word.source,

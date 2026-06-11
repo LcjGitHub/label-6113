@@ -2,6 +2,7 @@ export interface DialectWord {
   id: number
   dialect_word: string
   mandarin: string
+  pinyin: string
   region: string
   example: string
   source: string
@@ -11,10 +12,16 @@ export interface DialectWord {
 export interface WordForm {
   dialect_word: string
   mandarin: string
+  pinyin: string
   region: string
   example: string
   source: string
   remark: string
+}
+
+export interface Region {
+  region: string
+  count: number
 }
 
 export interface RegionStat {

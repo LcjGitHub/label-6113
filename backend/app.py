@@ -55,6 +55,7 @@ def create_word():
     word = DialectWord(
         dialect_word=data["dialect_word"].strip(),
         mandarin=data["mandarin"].strip(),
+        pinyin=(data.get("pinyin") or "").strip(),
         region=data["region"].strip(),
         example=(data.get("example") or "").strip(),
         source=(data.get("source") or "").strip(),
@@ -78,6 +79,7 @@ def update_word(word_id):
 
     word.dialect_word = data["dialect_word"].strip()
     word.mandarin = data["mandarin"].strip()
+    word.pinyin = (data.get("pinyin") or "").strip()
     word.region = data["region"].strip()
     word.example = (data.get("example") or "").strip()
     word.source = (data.get("source") or "").strip()
@@ -185,6 +187,9 @@ with app.app_context():
         columns = [row[1] for row in conn.execute(db.text("PRAGMA table_info(dialect_words)"))]
         if "remark" not in columns:
             conn.execute(db.text("ALTER TABLE dialect_words ADD COLUMN remark TEXT DEFAULT ''"))
+            conn.commit()
+        if "pinyin" not in columns:
+            conn.execute(db.text("ALTER TABLE dialect_words ADD COLUMN pinyin VARCHAR(200) DEFAULT ''"))
             conn.commit()
     seed_database()
 

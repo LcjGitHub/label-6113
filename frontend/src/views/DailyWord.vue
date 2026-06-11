@@ -26,6 +26,8 @@
 
         <div class="mandarin-word">{{ word.mandarin }}</div>
 
+        <div v-if="word.pinyin" class="pinyin-word">{{ word.pinyin }}</div>
+
         <div class="example-section">
           <div class="example-label">
             <ChatLineRound />
@@ -153,7 +155,16 @@ onMounted(() => {
   color: #303133;
   text-align: center;
   line-height: 1.4;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
+}
+
+.pinyin-word {
+  font-size: 20px;
+  color: #909399;
+  text-align: center;
+  line-height: 1.4;
+  margin-bottom: 16px;
+  letter-spacing: 2px;
 }
 
 .example-section {
