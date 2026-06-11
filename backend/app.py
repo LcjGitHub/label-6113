@@ -131,8 +131,16 @@ def get_random_word():
 
 @app.route("/api/regions", methods=["GET"])
 def list_regions():
-    rows = db.session.query(DialectWord.region).distinct().order_by(DialectWord.region).all()
-    return jsonify([row[0] for row in rows])
+    rows = (
+        db.session.query(
+            DialectWord.region,
+            db.func.count(DialectWord.id).label("count"),
+        )
+        .group_by(DialectWord.region)
+        .order_by(DialectWord.region)
+        .all()
+    )
+    return jsonify([{"region": row.region, "count": row.count} for row in rows])
 
 
 @app.route("/api/stats/region", methods=["GET"])

@@ -30,3 +30,8 @@ export interface RegionStatsResponse {
 export interface BatchDeleteResult {
   deleted_count: number
 }
+
+export interface Region {
+  region: string
+  count: number
+}

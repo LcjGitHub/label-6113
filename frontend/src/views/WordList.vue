@@ -21,10 +21,10 @@
             @change="handleRegionChange"
           >
             <el-option
-              v-for="region in regions"
-              :key="region"
-              :label="region"
-              :value="region"
+              v-for="item in regions"
+              :key="item.region"
+              :label="`${item.region}(${item.count})`"
+              :value="item.region"
             />
           </el-select>
           <el-button :icon="Refresh" @click="loadWords">刷新</el-button>
@@ -72,7 +72,7 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import { Delete, Refresh, Search } from '@element-plus/icons-vue'
 import { batchDeleteWords, deleteWord, fetchRegions, fetchWords } from '@/api/words'
 import { useRegionStore } from '@/stores/region'
-import type { DialectWord } from '@/types/word'
+import type { DialectWord, Region } from '@/types/word'
 import type { ElTable } from 'element-plus'
 
 const router = useRouter()
@@ -81,7 +81,7 @@ const regionStore = useRegionStore()
 const tableRef = ref<InstanceType<typeof ElTable>>()
 const loading = ref(false)
 const words = ref<DialectWord[]>([])
-const regions = ref<string[]>([])
+const regions = ref<Region[]>([])
 const keyword = ref('')
 const selectedIds = ref<number[]>([])
 
