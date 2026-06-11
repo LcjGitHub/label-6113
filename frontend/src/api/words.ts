@@ -1,5 +1,5 @@
 import axios from 'axios'
-import type { BatchDeleteResult, DialectWord, Region, WordForm } from '@/types/word'
+import type { BatchDeleteResult, BatchImportResult, DialectWord, Region, WordForm } from '@/types/word'
 
 const api = axios.create({
   baseURL: '/api',
@@ -64,5 +64,10 @@ export async function exportWords(region?: string, keyword?: string): Promise<vo
 
 export async function fetchRegions(): Promise<Region[]> {
   const { data } = await api.get<Region[]>('/regions')
+  return data
+}
+
+export async function batchImportWords(items: WordForm[]): Promise<BatchImportResult> {
+  const { data } = await api.post<BatchImportResult>('/words/batch-import', { items })
   return data
 }

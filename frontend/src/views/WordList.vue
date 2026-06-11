@@ -29,6 +29,7 @@
           </el-select>
           <el-button :icon="Refresh" @click="loadWords">刷新</el-button>
           <el-button type="success" :icon="Download" @click="handleExport">导出</el-button>
+          <el-button type="primary" :icon="Upload" @click="openImportDialog">导入</el-button>
           <el-button
             type="danger"
             :icon="Delete"
@@ -65,6 +66,38 @@
         </template>
       </el-table-column>
     </el-table>
+
+    <el-dialog v-model="importDialogVisible" title="批量导入词条" width="600px" @closed="handleImportDialogClosed">
+      <el-alert
+        type="info"
+        :closable="false"
+        style="margin-bottom: 16px"
+      >
+        <template #title>
+          <span>请粘贴或输入 JSON 格式的词条数组，每个词条对象包含 dialect_word（方言词）、mandarin（普通话）、region（地区）三个必填字段，可选字段包括 pinyin（拼音）、example（例句）、source（来源）、remark（备注）。</span>
+        </template>
+      </el-alert>
+      <el-input
+        v-model="importJsonText"
+        type="textarea"
+        :rows="14"
+        placeholder='例如：&#10;[&#10;  {&#10;    "dialect_word": "啥子",&#10;    "mandarin": "什么",&#10;    "region": "四川",&#10;    "pinyin": "shà zi",&#10;    "example": "你在搞啥子？",&#10;    "source": "日常用语",&#10;    "remark": "常用疑问词"&#10;  }&#10;]'
+      />
+      <div style="margin-top: 8px">
+        <el-button @click="handleSelectFile">选择 JSON 文件</el-button>
+        <input
+          ref="fileInputRef"
+          type="file"
+          accept=".json,application/json"
+          style="display: none"
+          @change="handleFileChange"
+        />
+      </div>
+      <template #footer>
+        <el-button @click="importDialogVisible = false">取消</el-button>
+        <el-button type="primary" :loading="importing" @click="handleImportConfirm">确认导入</el-button>
+      </template>
+    </el-dialog>
   </el-card>
 </template>
 
@@ -72,10 +105,10 @@
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Delete, Download, Refresh, Search } from '@element-plus/icons-vue'
-import { batchDeleteWords, deleteWord, exportWords, fetchRegions, fetchWords } from '@/api/words'
+import { Delete, Download, Refresh, Search, Upload } from '@element-plus/icons-vue'
+import { batchDeleteWords, batchImportWords, deleteWord, exportWords, fetchRegions, fetchWords } from '@/api/words'
 import { useRegionStore } from '@/stores/region'
-import type { DialectWord, Region } from '@/types/word'
+import type { DialectWord, Region, WordForm } from '@/types/word'
 
 const router = useRouter()
 const regionStore = useRegionStore()
@@ -86,6 +119,11 @@ const words = ref<DialectWord[]>([])
 const regions = ref<Region[]>([])
 const keyword = ref('')
 const selectedIds = ref<number[]>([])
+
+const importDialogVisible = ref(false)
+const importJsonText = ref('')
+const importing = ref(false)
+const fileInputRef = ref<HTMLInputElement | null>(null)
 
 async function loadWords() {
   loading.value = true
@@ -180,6 +218,89 @@ async function handleExport() {
     ElMessage.success('导出成功')
   } catch {
     ElMessage.error('导出失败')
+  }
+}
+
+function openImportDialog() {
+  importJsonText.value = ''
+  importDialogVisible.value = true
+}
+
+function handleImportDialogClosed() {
+  importJsonText.value = ''
+  if (fileInputRef.value) {
+    fileInputRef.value.value = ''
+  }
+}
+
+function handleSelectFile() {
+  fileInputRef.value?.click()
+}
+
+function handleFileChange(event: Event) {
+  const target = event.target as HTMLInputElement
+  const file = target.files?.[0]
+  if (!file) return
+
+  const reader = new FileReader()
+  reader.onload = (e) => {
+    const content = e.target?.result as string
+    importJsonText.value = content
+  }
+  reader.onerror = () => {
+    ElMessage.error('读取文件失败')
+  }
+  reader.readAsText(file)
+}
+
+async function handleImportConfirm() {
+  const text = importJsonText.value.trim()
+  if (!text) {
+    ElMessage.warning('请输入或粘贴 JSON 数据')
+    return
+  }
+
+  let items: WordForm[]
+  try {
+    const parsed = JSON.parse(text)
+    if (!Array.isArray(parsed)) {
+      ElMessage.error('JSON 数据必须是数组格式')
+      return
+    }
+    items = parsed as WordForm[]
+  } catch {
+    ElMessage.error('JSON 格式不正确，请检查语法')
+    return
+  }
+
+  if (items.length === 0) {
+    ElMessage.warning('没有可导入的词条数据')
+    return
+  }
+
+  importing.value = true
+  try {
+    const result = await batchImportWords(items)
+    let message = `导入完成：成功 ${result.success_count} 条，失败 ${result.fail_count} 条`
+    if (result.fail_count > 0) {
+      const detailList = result.failed_items
+        .slice(0, 5)
+        .map((item) => `第 ${item.index + 1} 条: ${item.error}`)
+        .join('\n')
+      const extra = result.failed_items.length > 5 ? `\n...还有 ${result.failed_items.length - 5} 条错误` : ''
+      message += `\n\n失败详情：\n${detailList}${extra}`
+      ElMessageBox.alert(message, '导入结果', { type: 'warning', dangerouslyUseHTMLString: false })
+    } else {
+      ElMessage.success(message)
+    }
+    importDialogVisible.value = false
+    await loadWords()
+    await loadRegions()
+  } catch (error: any) {
+    const msg = error?.response?.data?.error || '导入失败'
+    ElMessage.error(msg)
+  } finally {
+    importing.value = false
   }
 }
 

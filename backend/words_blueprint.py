@@ -165,6 +165,58 @@ def get_random_word():
     return jsonify(word.to_dict())
 
 
+@words_bp.route("/batch-import", methods=["POST"])
+def batch_import_words():
+    data = request.get_json(silent=True) or {}
+    items = data.get("items", [])
+    if not isinstance(items, list) or len(items) == 0:
+        return jsonify({"error": "请提供词条对象数组"}), 400
+
+    success_count = 0
+    fail_count = 0
+    failed_items = []
+
+    for index, item in enumerate(items):
+        if not isinstance(item, dict):
+            fail_count += 1
+            failed_items.append({"index": index, "error": "数据格式错误，不是有效的对象"})
+            continue
+
+        error = _validate_word_data(item)
+        if error:
+            fail_count += 1
+            failed_items.append({"index": index, "error": error})
+            continue
+
+        try:
+            word = DialectWord(
+                dialect_word=item["dialect_word"].strip(),
+                mandarin=item["mandarin"].strip(),
+                pinyin=(item.get("pinyin") or "").strip(),
+                region=item["region"].strip(),
+                example=(item.get("example") or "").strip(),
+                source=(item.get("source") or "").strip(),
+                remark=(item.get("remark") or "").strip(),
+            )
+            db.session.add(word)
+            success_count += 1
+        except Exception as e:
+            fail_count += 1
+            failed_items.append({"index": index, "error": f"添加失败: {str(e)}"})
+
+    try:
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": f"保存数据时发生错误: {str(e)}"}), 500
+
+    return jsonify({
+        "success_count": success_count,
+        "fail_count": fail_count,
+        "failed_items": failed_items,
+    })
+
+
 def _validate_word_data(data):
     required = ("dialect_word", "mandarin", "region")
     for field in required:

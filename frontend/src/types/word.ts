@@ -38,4 +38,19 @@ export interface BatchDeleteResult {
   deleted_count: number
 }
 
+export interface BatchImportFailedItem {
+  index: number
+  error: string
+}
+
+export interface BatchImportResult {
+  success_count: number
+  fail_count: number
+  failed_items: BatchImportFailedItem[]
+}
+
+export interface BatchImportRequest {
+  items: WordForm[]
+}
+
 
