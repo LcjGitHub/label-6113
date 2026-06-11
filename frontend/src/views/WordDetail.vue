@@ -67,6 +67,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from 'element-plus'
 import { Back } from '@element-plus/icons-vue'
 import { createWord, deleteWord, fetchWord, updateWord } from '@/api/words'
+import { useBrowserHistoryStore } from '@/stores/browserHistory'
 import type { WordForm } from '@/types/word'
 
 const props = defineProps<{
@@ -75,6 +76,7 @@ const props = defineProps<{
 
 const route = useRoute()
 const router = useRouter()
+const historyStore = useBrowserHistoryStore()
 
 const formRef = ref<FormInstance>()
 const loading = ref(false)
@@ -118,6 +120,7 @@ async function loadWord() {
       tags: word.tags,
       remark: word.remark,
     })
+    historyStore.addVisit(word.id, word.dialect_word)
   } catch {
     ElMessage.error('加载词条失败')
     router.push('/')

@@ -18,6 +18,13 @@
           >
             数据统计
           </el-button>
+          <el-button
+            :icon="Clock"
+            :type="isHistoryPage ? 'info' : 'default'"
+            @click="router.push('/history')"
+          >
+            浏览历史
+          </el-button>
           <el-button type="primary" :icon="Plus" @click="router.push('/words/new')">
             新增词条
           </el-button>
@@ -32,7 +39,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { Star, DataLine, Plus } from '@element-plus/icons-vue'
+import { Clock, Star, DataLine, Plus } from '@element-plus/icons-vue'
 import { useRoute, useRouter } from 'vue-router'
 
 const router = useRouter()
@@ -40,6 +47,7 @@ const route = useRoute()
 
 const isDailyPage = computed(() => route.name === 'daily-word')
 const isStatsPage = computed(() => route.name === 'stats')
+const isHistoryPage = computed(() => route.name === 'browser-history')
 </script>
 
 <style>

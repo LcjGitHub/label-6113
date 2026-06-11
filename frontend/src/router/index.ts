@@ -3,6 +3,7 @@ import WordList from '@/views/WordList.vue'
 import WordDetail from '@/views/WordDetail.vue'
 import Stats from '@/views/Stats.vue'
 import DailyWord from '@/views/DailyWord.vue'
+import BrowserHistory from '@/views/BrowserHistory.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -21,6 +22,11 @@ const router = createRouter({
       path: '/stats',
       name: 'stats',
       component: Stats,
+    },
+    {
+      path: '/history',
+      name: 'browser-history',
+      component: BrowserHistory,
     },
     {
       path: '/words/new',
