@@ -19,7 +19,13 @@
       empty-text="暂无统计数据"
     >
       <el-table-column type="index" label="序号" width="80" align="center" />
-      <el-table-column prop="region" label="地区" />
+      <el-table-column prop="region" label="地区">
+        <template #default="{ row }">
+          <el-link type="primary" :underline="false" @click="handleRegionClick(row.region)">
+            {{ row.region }}
+          </el-link>
+        </template>
+      </el-table-column>
       <el-table-column prop="count" label="词条数量" sortable>
         <template #default="{ row }">
           <el-tag :type="getTagType(row.count)">{{ row.count }}</el-tag>
@@ -41,11 +47,16 @@
 
 <script setup lang="ts">
 import { onMounted, onBeforeUnmount, ref, watch, nextTick } from 'vue'
+import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { Refresh } from '@element-plus/icons-vue'
 import * as echarts from 'echarts'
 import { fetchRegionStats } from '@/api/stats'
+import { useRegionStore } from '@/stores/region'
 import type { RegionStat } from '@/types/word'
+
+const router = useRouter()
+const regionStore = useRegionStore()
 
 const loading = ref(false)
 const total = ref(0)
@@ -133,6 +144,11 @@ async function loadStats() {
 
 function handleRefresh() {
   loadStats()
+}
+
+function handleRegionClick(region: string) {
+  regionStore.setRegion(region)
+  router.push('/')
 }
 
 function getTagType(count: number): 'success' | 'warning' | 'info' | 'primary' {

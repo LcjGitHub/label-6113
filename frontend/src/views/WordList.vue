@@ -143,7 +143,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Delete, Download, Refresh, Search, SortDown, SortUp, Upload } from '@element-plus/icons-vue'
@@ -376,6 +376,13 @@ async function handleImportConfirm() {
 onMounted(async () => {
   await Promise.all([loadWords(), loadRegions(), loadTags()])
 })
+
+watch(
+  () => regionStore.selectedRegion,
+  () => {
+    loadWords()
+  }
+)
 </script>
 
 <style scoped>
