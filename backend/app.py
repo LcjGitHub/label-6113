@@ -1,9 +1,11 @@
 import os
+from datetime import datetime, timezone
 
-from flask import Flask
+from flask import Flask, jsonify
 from flask_cors import CORS
+from sqlalchemy.exc import SQLAlchemyError
 
-from models import db
+from models import db, DialectWord
 from seed import seed_database
 from words_blueprint import words_bp
 from stats_blueprint import stats_bp
@@ -21,6 +23,22 @@ CORS(app)
 
 app.register_blueprint(words_bp)
 app.register_blueprint(stats_bp)
+
+
+@app.route("/api/health", methods=["GET"])
+def health_check():
+    try:
+        total_words = db.session.query(db.func.count(DialectWord.id)).scalar() or 0
+        return jsonify({
+            "status": "online",
+            "current_time": datetime.now(timezone.utc).isoformat(),
+            "total_words": total_words,
+        })
+    except SQLAlchemyError as e:
+        return jsonify({
+            "status": "offline",
+            "error": str(e),
+        }), 500
 
 
 with app.app_context():
