@@ -14,3 +14,8 @@ export interface WordForm {
   example: string
   source: string
 }
+
+export interface WordQueryParams {
+  region?: string
+  keyword?: string
+}

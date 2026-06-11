@@ -10,6 +10,7 @@
             clearable
             style="width: 220px"
             @keyup.enter="handleSearch"
+            @clear="handleClear"
           />
           <el-button type="primary" :icon="Search" @click="handleSearch">搜索</el-button>
           <el-select
@@ -17,7 +18,7 @@
             placeholder="按地区筛选"
             clearable
             style="width: 180px"
-            @change="loadWords"
+            @change="handleRegionChange"
           >
             <el-option
               v-for="region in regions"
@@ -26,7 +27,7 @@
               :value="region"
             />
           </el-select>
-          <el-button :icon="Refresh" @click="handleRefresh">刷新</el-button>
+          <el-button :icon="Refresh" @click="loadWords">刷新</el-button>
         </div>
       </div>
     </template>
@@ -58,9 +59,9 @@ import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Refresh, Search } from '@element-plus/icons-vue'
-import { deleteWord, fetchRegions, fetchWords } from '@/api/words'
+import { deleteWord, fetchRegions, fetchWords, searchWords } from '@/api/words'
 import { useRegionStore } from '@/stores/region'
-import type { DialectWord } from '@/types/word'
+import type { DialectWord, WordQueryParams } from '@/types/word'
 
 const router = useRouter()
 const regionStore = useRegionStore()
@@ -73,10 +74,14 @@ const keyword = ref('')
 async function loadWords() {
   loading.value = true
   try {
-    words.value = await fetchWords(
-      regionStore.selectedRegion || undefined,
-      keyword.value.trim() || undefined
-    )
+    const region = regionStore.selectedRegion || undefined
+    if (keyword.value.trim()) {
+      const params: WordQueryParams = { keyword: keyword.value.trim() }
+      if (region) params.region = region
+      words.value = await searchWords(params)
+    } else {
+      words.value = await fetchWords(region)
+    }
   } catch {
     ElMessage.error('加载词汇列表失败')
   } finally {
@@ -88,9 +93,12 @@ function handleSearch() {
   loadWords()
 }
 
-function handleRefresh() {
+function handleClear() {
   keyword.value = ''
-  regionStore.selectedRegion = ''
+  loadWords()
+}
+
+function handleRegionChange() {
   loadWords()
 }
 
