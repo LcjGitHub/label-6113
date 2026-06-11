@@ -4,7 +4,11 @@
       <div class="header-inner">
         <h1 class="title" @click="router.push('/')">方言词汇库</h1>
         <div class="nav-actions">
-          <el-button :icon="DataLine" @click="router.push('/stats')">
+          <el-button
+            :icon="DataLine"
+            :type="isStatsPage ? 'success' : 'default'"
+            @click="router.push('/stats')"
+          >
             数据统计
           </el-button>
           <el-button type="primary" :icon="Plus" @click="router.push('/words/new')">
@@ -20,10 +24,14 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 import { DataLine, Plus } from '@element-plus/icons-vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
 const router = useRouter()
+const route = useRoute()
+
+const isStatsPage = computed(() => route.name === 'stats')
 </script>
 
 <style>

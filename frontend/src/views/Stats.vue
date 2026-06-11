@@ -6,11 +6,18 @@
         <div class="total-badge">
           <span>全库总条数：</span>
           <el-tag type="primary" size="large">{{ total }}</el-tag>
+          <el-button :icon="Refresh" @click="handleRefresh">刷新</el-button>
         </div>
       </div>
     </template>
 
-    <el-table v-loading="loading" :data="stats" stripe style="width: 100%">
+    <el-table
+      v-loading="loading"
+      :data="stats"
+      stripe
+      style="width: 100%"
+      empty-text="暂无统计数据"
+    >
       <el-table-column type="index" label="序号" width="80" align="center" />
       <el-table-column prop="region" label="地区" />
       <el-table-column prop="count" label="词条数量" sortable>
@@ -25,6 +32,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { ElMessage } from 'element-plus'
+import { Refresh } from '@element-plus/icons-vue'
 import { fetchRegionStats } from '@/api/stats'
 import type { RegionStat } from '@/types/word'
 
@@ -43,6 +51,10 @@ async function loadStats() {
   } finally {
     loading.value = false
   }
+}
+
+function handleRefresh() {
+  loadStats()
 }
 
 function getTagType(count: number): 'success' | 'warning' | 'info' | 'primary' {
