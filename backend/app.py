@@ -151,6 +151,11 @@ def _validate_word_data(data):
 
 with app.app_context():
     db.create_all()
+    with db.engine.connect() as conn:
+        columns = [row[1] for row in conn.execute(db.text("PRAGMA table_info(dialect_words)"))]
+        if "remark" not in columns:
+            conn.execute(db.text("ALTER TABLE dialect_words ADD COLUMN remark TEXT DEFAULT ''"))
+            conn.commit()
     seed_database()
 
 

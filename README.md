@@ -104,11 +104,14 @@ npm run dev
 
 ## 数据字段
 
-- **方言词** `dialect_word`
-- **普通话** `mandarin`
-- **地区** `region`
-- **例句** `example`
-- **来源** `source`
+| 字段 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| `dialect_word` | `string` | 是 | 方言词 |
+| `mandarin` | `string` | 是 | 对应普通话 |
+| `region` | `string` | 是 | 地区 |
+| `example` | `string` | 否 | 例句 |
+| `source` | `string` | 否 | 来源 |
+| `remark` | `string` | 否 | 备注，可选文字说明 |
 
 ## Seed 数据
 

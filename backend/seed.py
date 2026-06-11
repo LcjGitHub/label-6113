@@ -7,6 +7,7 @@ SEED_DATA = [
         "region": "江西",
         "example": "你恰饭了冇？",
         "source": "南昌方言调查",
+        "remark": "赣语常用动词，也写作「呷饭」",
     },
     {
         "dialect_word": "落雨",
@@ -14,6 +15,7 @@ SEED_DATA = [
         "region": "广东",
         "example": "今日落雨，唔好出门。",
         "source": "粤语常用词",
+        "remark": "粤语中「落」字常用于描述天气现象，如落雪、落冰雹",
     },
     {
         "dialect_word": "晓得",

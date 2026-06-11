@@ -134,3 +134,6 @@ tmp/
 
 # App data
 history_snapshots.json
+
+# Database
+*.db
