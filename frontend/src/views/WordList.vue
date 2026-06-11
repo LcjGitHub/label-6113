@@ -4,6 +4,14 @@
       <div class="card-header">
         <span>词汇列表</span>
         <div class="filters">
+          <el-input
+            v-model="keyword"
+            placeholder="输入关键词搜索"
+            clearable
+            style="width: 220px"
+            @keyup.enter="handleSearch"
+          />
+          <el-button type="primary" :icon="Search" @click="handleSearch">搜索</el-button>
           <el-select
             v-model="regionStore.selectedRegion"
             placeholder="按地区筛选"
@@ -18,7 +26,7 @@
               :value="region"
             />
           </el-select>
-          <el-button :icon="Refresh" @click="loadWords">刷新</el-button>
+          <el-button :icon="Refresh" @click="handleRefresh">刷新</el-button>
         </div>
       </div>
     </template>
@@ -49,7 +57,7 @@
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Refresh } from '@element-plus/icons-vue'
+import { Refresh, Search } from '@element-plus/icons-vue'
 import { deleteWord, fetchRegions, fetchWords } from '@/api/words'
 import { useRegionStore } from '@/stores/region'
 import type { DialectWord } from '@/types/word'
@@ -60,16 +68,30 @@ const regionStore = useRegionStore()
 const loading = ref(false)
 const words = ref<DialectWord[]>([])
 const regions = ref<string[]>([])
+const keyword = ref('')
 
 async function loadWords() {
   loading.value = true
   try {
-    words.value = await fetchWords(regionStore.selectedRegion || undefined)
+    words.value = await fetchWords(
+      regionStore.selectedRegion || undefined,
+      keyword.value.trim() || undefined
+    )
   } catch {
     ElMessage.error('加载词汇列表失败')
   } finally {
     loading.value = false
   }
+}
+
+function handleSearch() {
+  loadWords()
+}
+
+function handleRefresh() {
+  keyword.value = ''
+  regionStore.selectedRegion = ''
+  loadWords()
 }
 
 async function loadRegions() {
