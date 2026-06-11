@@ -26,18 +26,21 @@
 
         <div class="mandarin-word">{{ word.mandarin }}</div>
 
-        <div v-if="word.example" class="example-section">
+        <div class="example-section">
           <div class="example-label">
             <ChatLineRound />
             <span>例句</span>
           </div>
-          <div class="example-text">「{{ word.example }}」</div>
+          <div v-if="word.example" class="example-text">「{{ word.example }}」</div>
+          <div v-else class="example-empty">暂无例句</div>
         </div>
 
         <div class="word-id">
           <el-tag type="info" size="small">#{{ word.id }}</el-tag>
         </div>
       </template>
+
+      <el-empty v-else-if="!loading && isEmpty" description="暂无词条数据" />
     </div>
   </el-card>
 </template>
@@ -51,13 +54,23 @@ import type { DialectWord } from '@/types/word'
 
 const loading = ref(false)
 const word = ref<DialectWord | null>(null)
+const isEmpty = ref(false)
 
 async function loadRandomWord() {
   loading.value = true
+  isEmpty.value = false
   try {
     word.value = await fetchRandomWord()
-  } catch {
-    ElMessage.error('获取随机词条失败')
+  } catch (e: any) {
+    const status = e?.response?.status
+    if (status === 404) {
+      word.value = null
+      isEmpty.value = true
+    } else {
+      word.value = null
+      isEmpty.value = true
+      ElMessage.error('获取随机词条失败')
+    }
   } finally {
     loading.value = false
   }
@@ -86,15 +99,15 @@ onMounted(() => {
 }
 
 .word-content {
-  padding: 20px 10px;
-  min-height: 400px;
+  padding: 16px 10px;
+  min-height: 360px;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
 .region-tag {
-  margin-bottom: 32px;
+  margin-bottom: 16px;
 }
 
 .region-tag :deep(.el-tag) {
@@ -113,19 +126,19 @@ onMounted(() => {
 }
 
 .dialect-word {
-  font-size: 72px;
+  font-size: 48px;
   font-weight: 700;
   color: #409eff;
   text-align: center;
   line-height: 1.2;
   letter-spacing: 4px;
-  margin-bottom: 24px;
+  margin-bottom: 12px;
   text-shadow: 2px 2px 8px rgba(64, 158, 255, 0.15);
 }
 
 .divider {
   width: 80%;
-  margin: 8px 0;
+  margin: 4px 0;
 }
 
 .divider :deep(.el-divider__text) {
@@ -135,12 +148,12 @@ onMounted(() => {
 }
 
 .mandarin-word {
-  font-size: 36px;
+  font-size: 30px;
   font-weight: 500;
   color: #303133;
   text-align: center;
   line-height: 1.4;
-  margin-bottom: 40px;
+  margin-bottom: 20px;
 }
 
 .example-section {
@@ -148,8 +161,8 @@ onMounted(() => {
   max-width: 600px;
   background: #f5f7fa;
   border-radius: 12px;
-  padding: 24px 28px;
-  margin-bottom: 32px;
+  padding: 18px 24px;
+  margin-bottom: 16px;
 }
 
 .example-label {
@@ -159,12 +172,19 @@ onMounted(() => {
   font-size: 14px;
   color: #67c23a;
   font-weight: 600;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
 .example-text {
-  font-size: 20px;
+  font-size: 18px;
   color: #606266;
+  line-height: 1.8;
+  font-style: italic;
+}
+
+.example-empty {
+  font-size: 16px;
+  color: #c0c4cc;
   line-height: 1.8;
   font-style: italic;
 }

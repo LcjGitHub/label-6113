@@ -137,3 +137,8 @@ history_snapshots.json
 
 # Database
 *.db
+
+# Frontend build artifacts
+frontend/dist/
+frontend/*.tsbuildinfo
+frontend/.vite/
