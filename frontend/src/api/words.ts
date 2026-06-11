@@ -1,5 +1,5 @@
 import axios from 'axios'
-import type { BatchDeleteResult, BatchImportResult, DialectWord, Region, WordForm } from '@/types/word'
+import type { AdjacentWords, BatchDeleteResult, BatchImportResult, DialectWord, Region, WordForm } from '@/types/word'
 
 const api = axios.create({
   baseURL: '/api',
@@ -77,5 +77,10 @@ export async function batchImportWords(items: WordForm[]): Promise<BatchImportRe
 
 export async function fetchTags(): Promise<string[]> {
   const { data } = await api.get<string[]>('/words/tags')
+  return data
+}
+
+export async function fetchAdjacentWords(id: number): Promise<AdjacentWords> {
+  const { data } = await api.get<AdjacentWords>(`/words/${id}/adjacent`)
   return data
 }

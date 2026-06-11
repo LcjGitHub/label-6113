@@ -235,6 +235,37 @@ def batch_import_words():
     })
 
 
+@words_bp.route("/<int:word_id>/adjacent", methods=["GET"])
+def get_adjacent_words(word_id):
+    word = db.session.get(DialectWord, word_id)
+    if not word:
+        return jsonify({"error": "词条不存在"}), 404
+
+    prev_word = (
+        DialectWord.query
+        .filter(DialectWord.id < word_id)
+        .order_by(DialectWord.id.desc())
+        .first()
+    )
+    next_word = (
+        DialectWord.query
+        .filter(DialectWord.id > word_id)
+        .order_by(DialectWord.id.asc())
+        .first()
+    )
+
+    return jsonify({
+        "prev": {
+            "id": prev_word.id,
+            "dialect_word": prev_word.dialect_word,
+        } if prev_word else None,
+        "next": {
+            "id": next_word.id,
+            "dialect_word": next_word.dialect_word,
+        } if next_word else None,
+    })
+
+
 @words_bp.route("/tags", methods=["GET"])
 def list_tags():
     words = DialectWord.query.order_by(DialectWord.id).all()

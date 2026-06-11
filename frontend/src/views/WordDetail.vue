@@ -3,7 +3,25 @@
     <template #header>
       <div class="card-header">
         <span>{{ isCreate ? '新增词条' : '词条详情 / 编辑' }}</span>
-        <el-button :icon="Back" @click="router.push('/')">返回列表</el-button>
+        <div class="header-actions">
+          <template v-if="!isCreate">
+            <el-button
+              :icon="ArrowLeft"
+              :disabled="!adjacent.prev"
+              @click="handlePrev"
+            >
+              上一条{{ adjacent.prev ? `：${adjacent.prev.dialect_word}` : '' }}
+            </el-button>
+            <el-button
+              :icon="ArrowRight"
+              :disabled="!adjacent.next"
+              @click="handleNext"
+            >
+              下一条{{ adjacent.next ? `：${adjacent.next.dialect_word}` : '' }}
+            </el-button>
+          </template>
+          <el-button :icon="Back" @click="router.push('/')">返回列表</el-button>
+        </div>
       </div>
     </template>
 
@@ -62,13 +80,13 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from 'element-plus'
-import { Back } from '@element-plus/icons-vue'
-import { createWord, deleteWord, fetchWord, updateWord } from '@/api/words'
+import { ArrowLeft, ArrowRight, Back } from '@element-plus/icons-vue'
+import { createWord, deleteWord, fetchAdjacentWords, fetchWord, updateWord } from '@/api/words'
 import { useBrowserHistoryStore } from '@/stores/browserHistory'
-import type { WordForm } from '@/types/word'
+import type { AdjacentWords, WordForm } from '@/types/word'
 
 const props = defineProps<{
   id?: string
@@ -82,6 +100,11 @@ const formRef = ref<FormInstance>()
 const loading = ref(false)
 const saving = ref(false)
 const deleting = ref(false)
+
+const adjacent = reactive<AdjacentWords>({
+  prev: null,
+  next: null,
+})
 
 const form = reactive<WordForm>({
   dialect_word: '',
@@ -104,6 +127,8 @@ const isCreate = computed(() => route.name === 'word-create')
 
 async function loadWord() {
   if (isCreate.value || !props.id) {
+    adjacent.prev = null
+    adjacent.next = null
     return
   }
 
@@ -121,11 +146,27 @@ async function loadWord() {
       remark: word.remark,
     })
     historyStore.addVisit(word.id, word.dialect_word)
+
+    const adj = await fetchAdjacentWords(Number(props.id))
+    adjacent.prev = adj.prev
+    adjacent.next = adj.next
   } catch {
     ElMessage.error('加载词条失败')
     router.push('/')
   } finally {
     loading.value = false
+  }
+}
+
+function handlePrev() {
+  if (adjacent.prev) {
+    router.push(`/words/${adjacent.prev.id}`)
+  }
+}
+
+function handleNext() {
+  if (adjacent.next) {
+    router.push(`/words/${adjacent.next.id}`)
   }
 }
 
@@ -173,6 +214,10 @@ async function handleDelete() {
 }
 
 onMounted(loadWord)
+
+watch(() => props.id, () => {
+  loadWord()
+})
 </script>
 
 <style scoped>
@@ -180,5 +225,11 @@ onMounted(loadWord)
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 </style>

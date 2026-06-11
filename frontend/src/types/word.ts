@@ -55,4 +55,14 @@ export interface BatchImportRequest {
   items: WordForm[]
 }
 
+export interface AdjacentWord {
+  id: number
+  dialect_word: string
+}
+
+export interface AdjacentWords {
+  prev: AdjacentWord | null
+  next: AdjacentWord | null
+}
+
 
