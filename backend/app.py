@@ -126,7 +126,11 @@ def batch_delete_words():
 
 @app.route("/api/words/random", methods=["GET"])
 def get_random_word():
-    word = DialectWord.query.order_by(db.func.random()).first()
+    region = request.args.get("region", "").strip()
+    query = DialectWord.query
+    if region:
+        query = query.filter(DialectWord.region == region)
+    word = query.order_by(db.func.random()).first()
     if not word:
         return jsonify({"error": "暂无词条数据"}), 404
     return jsonify(word.to_dict())

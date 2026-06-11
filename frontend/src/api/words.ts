@@ -37,8 +37,10 @@ export async function batchDeleteWords(ids: number[]): Promise<BatchDeleteResult
   return data
 }
 
-export async function fetchRandomWord(): Promise<DialectWord> {
-  const { data } = await api.get<DialectWord>('/words/random')
+export async function fetchRandomWord(region?: string): Promise<DialectWord> {
+  const params: Record<string, string> = {}
+  if (region) params.region = region
+  const { data } = await api.get<DialectWord>('/words/random', { params })
   return data
 }
 

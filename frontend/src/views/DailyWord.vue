@@ -2,7 +2,15 @@
   <el-card shadow="never" class="daily-card">
     <template #header>
       <div class="card-header">
-        <span class="header-title">每日一词</span>
+        <div class="title-group">
+          <span class="header-title">每日一词</span>
+          <el-tag v-if="currentRegion" type="success" size="small" effect="light">
+            地区: {{ currentRegion }}
+          </el-tag>
+          <el-tag v-else type="info" size="small" effect="light">
+            全库随机
+          </el-tag>
+        </div>
         <el-button type="primary" :icon="RefreshRight" :loading="loading" @click="loadRandomWord">
           换一条
         </el-button>
@@ -48,21 +56,27 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, computed } from 'vue'
 import { ElMessage } from 'element-plus'
 import { RefreshRight, Location, ChatLineRound } from '@element-plus/icons-vue'
 import { fetchRandomWord } from '@/api/words'
+import { useRegionStore } from '@/stores/region'
 import type { DialectWord } from '@/types/word'
+
+const regionStore = useRegionStore()
 
 const loading = ref(false)
 const word = ref<DialectWord | null>(null)
 const isEmpty = ref(false)
 
+const currentRegion = computed(() => regionStore.selectedRegion)
+
 async function loadRandomWord() {
   loading.value = true
   isEmpty.value = false
   try {
-    word.value = await fetchRandomWord()
+    const region = currentRegion.value || undefined
+    word.value = await fetchRandomWord(region)
   } catch (e: any) {
     const status = e?.response?.status
     if (status === 404) {
@@ -92,6 +106,12 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
+}
+
+.title-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .header-title {
