@@ -5,10 +5,11 @@ const api = axios.create({
   baseURL: '/api',
 })
 
-export async function fetchWords(region?: string, keyword?: string): Promise<DialectWord[]> {
+export async function fetchWords(region?: string, keyword?: string, tag?: string): Promise<DialectWord[]> {
   const params: Record<string, string> = {}
   if (region) params.region = region
   if (keyword) params.keyword = keyword
+  if (tag) params.tag = tag
   const { data } = await api.get<DialectWord[]>('/words', { params })
   return data
 }
@@ -69,5 +70,10 @@ export async function fetchRegions(): Promise<Region[]> {
 
 export async function batchImportWords(items: WordForm[]): Promise<BatchImportResult> {
   const { data } = await api.post<BatchImportResult>('/words/batch-import', { items })
+  return data
+}
+
+export async function fetchTags(): Promise<string[]> {
+  const { data } = await api.get<string[]>('/words/tags')
   return data
 }

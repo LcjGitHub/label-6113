@@ -33,6 +33,9 @@ with app.app_context():
         if "pinyin" not in columns:
             conn.execute(db.text("ALTER TABLE dialect_words ADD COLUMN pinyin VARCHAR(200) DEFAULT ''"))
             conn.commit()
+        if "tags" not in columns:
+            conn.execute(db.text("ALTER TABLE dialect_words ADD COLUMN tags VARCHAR(500) DEFAULT ''"))
+            conn.commit()
     seed_database()
 
 

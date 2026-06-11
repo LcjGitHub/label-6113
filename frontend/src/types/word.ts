@@ -7,6 +7,7 @@ export interface DialectWord {
   example: string
   source: string
   remark: string
+  tags: string
 }
 
 export interface WordForm {
@@ -17,6 +18,7 @@ export interface WordForm {
   example: string
   source: string
   remark: string
+  tags: string
 }
 
 export interface Region {

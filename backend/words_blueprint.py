@@ -12,6 +12,7 @@ words_bp = Blueprint("words", __name__, url_prefix="/api/words")
 def list_words():
     region = request.args.get("region", "").strip()
     keyword = request.args.get("keyword", "").strip()
+    tag = request.args.get("tag", "").strip()
     query = DialectWord.query
     if region:
         query = query.filter(DialectWord.region == region)
@@ -24,6 +25,8 @@ def list_words():
                 DialectWord.pinyin.like(like_pattern),
             )
         )
+    if tag:
+        query = query.filter(db.literal(",").concat(DialectWord.tags).concat(",").like(f"%,{tag},%"))
     words = query.order_by(DialectWord.id).all()
     return jsonify([word.to_dict() for word in words])
 
@@ -48,7 +51,7 @@ def export_words():
 
     output = io.StringIO()
     writer = csv.writer(output)
-    writer.writerow(["方言词", "普通话", "拼音", "地区", "例句", "来源", "备注"])
+    writer.writerow(["方言词", "普通话", "拼音", "地区", "例句", "来源", "备注", "标签"])
     for word in words:
         writer.writerow([
             word.dialect_word or "",
@@ -58,6 +61,7 @@ def export_words():
             word.example or "",
             word.source or "",
             word.remark or "",
+            word.tags or "",
         ])
 
     output.seek(0)
@@ -90,6 +94,7 @@ def create_word():
         example=(data.get("example") or "").strip(),
         source=(data.get("source") or "").strip(),
         remark=(data.get("remark") or "").strip(),
+        tags=(data.get("tags") or "").strip(),
     )
     db.session.add(word)
     db.session.commit()
@@ -114,6 +119,7 @@ def update_word(word_id):
     word.example = (data.get("example") or "").strip()
     word.source = (data.get("source") or "").strip()
     word.remark = (data.get("remark") or "").strip()
+    word.tags = (data.get("tags") or "").strip()
     db.session.commit()
     return jsonify(word.to_dict())
 
@@ -197,6 +203,7 @@ def batch_import_words():
                 example=(item.get("example") or "").strip(),
                 source=(item.get("source") or "").strip(),
                 remark=(item.get("remark") or "").strip(),
+                tags=(item.get("tags") or "").strip(),
             )
             db.session.add(word)
             success_count += 1
@@ -215,6 +222,19 @@ def batch_import_words():
         "fail_count": fail_count,
         "failed_items": failed_items,
     })
+
+
+@words_bp.route("/tags", methods=["GET"])
+def list_tags():
+    words = DialectWord.query.order_by(DialectWord.id).all()
+    tag_set = set()
+    for word in words:
+        if word.tags:
+            for t in word.tags.split(","):
+                t = t.strip()
+                if t:
+                    tag_set.add(t)
+    return jsonify(sorted(tag_set))
 
 
 def _validate_word_data(data):

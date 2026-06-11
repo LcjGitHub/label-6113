@@ -38,6 +38,9 @@
       <el-form-item label="来源" prop="source">
         <el-input v-model="form.source" placeholder="请输入来源" />
       </el-form-item>
+      <el-form-item label="标签" prop="tags">
+        <el-input v-model="form.tags" placeholder="多个标签用逗号分隔，如：动词,常用" />
+      </el-form-item>
       <el-form-item label="备注" prop="remark">
         <el-input
           v-model="form.remark"
@@ -85,6 +88,7 @@ const form = reactive<WordForm>({
   region: '',
   example: '',
   source: '',
+  tags: '',
   remark: '',
 })
 
@@ -111,6 +115,7 @@ async function loadWord() {
       region: word.region,
       example: word.example,
       source: word.source,
+      tags: word.tags,
       remark: word.remark,
     })
   } catch {

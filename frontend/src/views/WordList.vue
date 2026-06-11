@@ -27,6 +27,20 @@
               :value="item.region"
             />
           </el-select>
+          <el-select
+            v-model="selectedTag"
+            placeholder="按标签筛选"
+            clearable
+            style="width: 160px"
+            @change="handleTagChange"
+          >
+            <el-option
+              v-for="tag in allTags"
+              :key="tag"
+              :label="tag"
+              :value="tag"
+            />
+          </el-select>
           <el-button :icon="Refresh" @click="loadWords">刷新</el-button>
           <el-button type="success" :icon="Download" @click="handleExport">导出</el-button>
           <el-button type="primary" :icon="Upload" @click="openImportDialog">导入</el-button>
@@ -58,6 +72,20 @@
       <el-table-column prop="region" label="地区" width="90" />
       <el-table-column prop="example" label="例句" show-overflow-tooltip />
       <el-table-column prop="source" label="来源" width="140" show-overflow-tooltip />
+      <el-table-column label="标签" width="180">
+        <template #default="{ row }">
+          <template v-if="row.tags">
+            <el-tag
+              v-for="t in row.tags.split(',').map((s: string) => s.trim()).filter(Boolean)"
+              :key="t"
+              size="small"
+              style="margin: 2px"
+            >
+              {{ t }}
+            </el-tag>
+          </template>
+        </template>
+      </el-table-column>
       <el-table-column prop="remark" label="备注" width="160" show-overflow-tooltip />
       <el-table-column label="操作" width="140" fixed="right">
         <template #default="{ row }">
@@ -106,7 +134,7 @@ import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Delete, Download, Refresh, Search, Upload } from '@element-plus/icons-vue'
-import { batchDeleteWords, batchImportWords, deleteWord, exportWords, fetchRegions, fetchWords } from '@/api/words'
+import { batchDeleteWords, batchImportWords, deleteWord, exportWords, fetchRegions, fetchTags, fetchWords } from '@/api/words'
 import { useRegionStore } from '@/stores/region'
 import type { DialectWord, Region, WordForm } from '@/types/word'
 
@@ -118,6 +146,8 @@ const loading = ref(false)
 const words = ref<DialectWord[]>([])
 const regions = ref<Region[]>([])
 const keyword = ref('')
+const selectedTag = ref('')
+const allTags = ref<string[]>([])
 const selectedIds = ref<number[]>([])
 
 const importDialogVisible = ref(false)
@@ -130,7 +160,8 @@ async function loadWords() {
   try {
     const region = regionStore.selectedRegion || undefined
     const kw = keyword.value.trim() || undefined
-    words.value = await fetchWords(region, kw)
+    const tag = selectedTag.value || undefined
+    words.value = await fetchWords(region, kw, tag)
   } catch {
     ElMessage.error('加载词汇列表失败')
   } finally {
@@ -149,6 +180,18 @@ function handleClear() {
 
 function handleRegionChange() {
   loadWords()
+}
+
+function handleTagChange() {
+  loadWords()
+}
+
+async function loadTags() {
+  try {
+    allTags.value = await fetchTags()
+  } catch {
+    // silent
+  }
 }
 
 async function loadRegions() {
@@ -305,7 +348,7 @@ async function handleImportConfirm() {
 }
 
 onMounted(async () => {
-  await Promise.all([loadWords(), loadRegions()])
+  await Promise.all([loadWords(), loadRegions(), loadTags()])
 })
 </script>
 
