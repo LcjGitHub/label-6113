@@ -1,4 +1,7 @@
-from flask import Blueprint, jsonify, request
+import csv
+import io
+
+from flask import Blueprint, jsonify, request, make_response
 
 from models import DialectWord, db
 
@@ -23,6 +26,45 @@ def list_words():
         )
     words = query.order_by(DialectWord.id).all()
     return jsonify([word.to_dict() for word in words])
+
+
+@words_bp.route("/export", methods=["GET"])
+def export_words():
+    region = request.args.get("region", "").strip()
+    keyword = request.args.get("keyword", "").strip()
+    query = DialectWord.query
+    if region:
+        query = query.filter(DialectWord.region == region)
+    if keyword:
+        like_pattern = f"%{keyword}%"
+        query = query.filter(
+            db.or_(
+                DialectWord.dialect_word.like(like_pattern),
+                DialectWord.mandarin.like(like_pattern),
+                DialectWord.pinyin.like(like_pattern),
+            )
+        )
+    words = query.order_by(DialectWord.id).all()
+
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(["方言词", "普通话", "拼音", "地区", "例句", "来源", "备注"])
+    for word in words:
+        writer.writerow([
+            word.dialect_word or "",
+            word.mandarin or "",
+            word.pinyin or "",
+            word.region or "",
+            word.example or "",
+            word.source or "",
+            word.remark or "",
+        ])
+
+    output.seek(0)
+    response = make_response(output.getvalue())
+    response.headers["Content-Type"] = "text/csv; charset=utf-8"
+    response.headers["Content-Disposition"] = "attachment; filename=dialect_words.csv"
+    return response
 
 
 @words_bp.route("/<int:word_id>", methods=["GET"])

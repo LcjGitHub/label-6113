@@ -44,6 +44,24 @@ export async function fetchRandomWord(region?: string): Promise<DialectWord> {
   return data
 }
 
+export async function exportWords(region?: string, keyword?: string): Promise<void> {
+  const params: Record<string, string> = {}
+  if (region) params.region = region
+  if (keyword) params.keyword = keyword
+  const { data } = await api.get('/words/export', {
+    params,
+    responseType: 'blob',
+  })
+  const url = URL.createObjectURL(new Blob([data]))
+  const link = document.createElement('a')
+  link.href = url
+  link.download = 'dialect_words.csv'
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+  URL.revokeObjectURL(url)
+}
+
 export async function fetchRegions(): Promise<Region[]> {
   const { data } = await api.get<Region[]>('/regions')
   return data

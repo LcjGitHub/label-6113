@@ -28,6 +28,7 @@
             />
           </el-select>
           <el-button :icon="Refresh" @click="loadWords">刷新</el-button>
+          <el-button type="success" :icon="Download" @click="handleExport">导出</el-button>
           <el-button
             type="danger"
             :icon="Delete"
@@ -71,8 +72,8 @@
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Delete, Refresh, Search } from '@element-plus/icons-vue'
-import { batchDeleteWords, deleteWord, fetchRegions, fetchWords } from '@/api/words'
+import { Delete, Download, Refresh, Search } from '@element-plus/icons-vue'
+import { batchDeleteWords, deleteWord, exportWords, fetchRegions, fetchWords } from '@/api/words'
 import { useRegionStore } from '@/stores/region'
 import type { DialectWord, Region } from '@/types/word'
 
@@ -168,6 +169,17 @@ async function handleBatchDelete() {
       ElMessage.error('批量删除失败')
       clearSelection()
     }
+  }
+}
+
+async function handleExport() {
+  try {
+    const region = regionStore.selectedRegion || undefined
+    const kw = keyword.value.trim() || undefined
+    await exportWords(region, kw)
+    ElMessage.success('导出成功')
+  } catch {
+    ElMessage.error('导出失败')
   }
 }
 
