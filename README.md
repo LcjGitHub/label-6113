@@ -25,7 +25,34 @@
     └── package.json
 ```
 
-## 快速启动
+## Docker 启动（一键部署）
+
+使用 Docker Compose 可一键构建并启动前后端服务，无需手动安装 Python、Node 等环境。
+
+### 构建并启动
+
+```bash
+docker compose up -d --build
+```
+
+### 访问地址
+
+| 服务 | 地址 | 说明 |
+|------|------|------|
+| 前端 | `http://localhost` | Nginx 提供静态文件，端口 80 |
+| 后端 | `http://localhost:4000` | Flask API，端口 4000 |
+
+前端 Nginx 会自动将 `/api` 请求代理到后端服务，直接访问 `http://localhost` 即可正常使用。后端 SQLite 数据库文件通过卷挂载持久化到宿主机 `./backend/instance/` 目录，容器重建后数据不会丢失。
+
+### 停止服务
+
+```bash
+docker compose down
+```
+
+> 如需同时清除数据卷，使用 `docker compose down -v`，但注意这会删除 SQLite 数据库文件。
+
+## 快速启动（本地开发）
 
 ### 1. 后端（端口 4000）
 

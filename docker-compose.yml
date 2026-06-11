@@ -1,0 +1,14 @@
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "4000:4000"
+    volumes:
+      - ./backend/instance:/app/instance
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
