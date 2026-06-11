@@ -28,6 +28,14 @@
             />
           </el-select>
           <el-button :icon="Refresh" @click="loadWords">刷新</el-button>
+          <el-button
+            v-if="selectedIds.length > 0"
+            type="danger"
+            :icon="Delete"
+            @click="handleBatchDelete"
+          >
+            批量删除 ({{ selectedIds.length }})
+          </el-button>
         </div>
       </div>
     </template>
@@ -38,7 +46,9 @@
       stripe
       style="width: 100%"
       @row-click="handleRowClick"
+      @selection-change="handleSelectionChange"
     >
+      <el-table-column type="selection" width="55" />
       <el-table-column prop="dialect_word" label="方言词" width="120" />
       <el-table-column prop="mandarin" label="普通话" width="120" />
       <el-table-column prop="region" label="地区" width="100" />
@@ -59,8 +69,8 @@
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Refresh, Search } from '@element-plus/icons-vue'
-import { deleteWord, fetchRegions, fetchWords, searchWords } from '@/api/words'
+import { Delete, Refresh, Search } from '@element-plus/icons-vue'
+import { batchDeleteWords, deleteWord, fetchRegions, fetchWords, searchWords } from '@/api/words'
 import { useRegionStore } from '@/stores/region'
 import type { DialectWord, WordQueryParams } from '@/types/word'
 
@@ -71,6 +81,7 @@ const loading = ref(false)
 const words = ref<DialectWord[]>([])
 const regions = ref<string[]>([])
 const keyword = ref('')
+const selectedIds = ref<number[]>([])
 
 async function loadWords() {
   loading.value = true
@@ -129,6 +140,29 @@ async function handleDelete(id: number) {
   } catch (error) {
     if (error !== 'cancel') {
       ElMessage.error('删除失败')
+    }
+  }
+}
+
+function handleSelectionChange(selection: DialectWord[]) {
+  selectedIds.value = selection.map((item) => item.id)
+}
+
+async function handleBatchDelete() {
+  try {
+    await ElMessageBox.confirm(
+      `确定删除选中的 ${selectedIds.value.length} 条词条吗？`,
+      '提示',
+      { type: 'warning' }
+    )
+    const result = await batchDeleteWords(selectedIds.value)
+    ElMessage.success(`成功删除 ${result.deleted_count} 条词条`)
+    selectedIds.value = []
+    await loadWords()
+    await loadRegions()
+  } catch (error) {
+    if (error !== 'cancel') {
+      ElMessage.error('批量删除失败')
     }
   }
 }

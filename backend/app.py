@@ -107,6 +107,31 @@ def delete_word(word_id):
     return jsonify({"message": "删除成功"})
 
 
+@app.route("/api/words/batch-delete", methods=["POST"])
+def batch_delete_words():
+    data = request.get_json(silent=True) or {}
+    ids = data.get("ids", [])
+    if not isinstance(ids, list) or len(ids) == 0:
+        return jsonify({"error": "请提供要删除的词条编号数组"}), 400
+
+    valid_ids = []
+    for wid in ids:
+        if isinstance(wid, int) and wid > 0:
+            valid_ids.append(wid)
+        elif isinstance(wid, str) and wid.isdigit():
+            valid_ids.append(int(wid))
+
+    if not valid_ids:
+        return jsonify({"error": "无效的词条编号"}), 400
+
+    words_to_delete = DialectWord.query.filter(DialectWord.id.in_(valid_ids)).all()
+    deleted_count = len(words_to_delete)
+    for word in words_to_delete:
+        db.session.delete(word)
+    db.session.commit()
+    return jsonify({"deleted_count": deleted_count})
+
+
 @app.route("/api/words/random", methods=["GET"])
 def get_random_word():
     word = DialectWord.query.order_by(db.func.random()).first()

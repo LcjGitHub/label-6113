@@ -1,5 +1,5 @@
 import axios from 'axios'
-import type { DialectWord, WordForm, WordQueryParams } from '@/types/word'
+import type { BatchDeleteResult, DialectWord, WordForm, WordQueryParams } from '@/types/word'
 
 const api = axios.create({
   baseURL: '/api',
@@ -33,6 +33,11 @@ export async function updateWord(id: number, form: WordForm): Promise<DialectWor
 
 export async function deleteWord(id: number): Promise<void> {
   await api.delete(`/words/${id}`)
+}
+
+export async function batchDeleteWords(ids: number[]): Promise<BatchDeleteResult> {
+  const { data } = await api.post<BatchDeleteResult>('/words/batch-delete', { ids })
+  return data
 }
 
 export async function fetchRandomWord(): Promise<DialectWord> {

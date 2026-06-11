@@ -31,3 +31,7 @@ export interface RegionStatsResponse {
   total: number
   regions: RegionStat[]
 }
+
+export interface BatchDeleteResult {
+  deleted_count: number
+}
