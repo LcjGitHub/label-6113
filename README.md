@@ -72,6 +72,20 @@ python app.py
 
 后端启动后访问 `http://localhost:4000/api/words` 可查看词条列表。首次运行会自动创建数据库并写入 5 条 seed 数据。
 
+### 运行单元测试
+
+在 `backend` 目录下执行以下命令运行 pytest 单元测试（使用内存 SQLite 数据库，不影响真实数据）：
+
+```bash
+cd backend
+pip install -r requirements.txt
+python -m pytest tests/ -v
+```
+
+测试文件位于 `backend/tests/` 目录下，包括：
+- `test_word_queries.py`：词条查询接口测试（无条件、按地区筛选、关键词搜索）
+- `test_word_operations.py`：新增词条和批量删除接口测试
+
 ### 2. 前端（端口 4101）
 
 另开一个终端：
