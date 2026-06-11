@@ -31,6 +31,7 @@ def list_words():
             db.or_(
                 DialectWord.dialect_word.like(like_pattern),
                 DialectWord.mandarin.like(like_pattern),
+                DialectWord.pinyin.like(like_pattern),
             )
         )
     words = query.order_by(DialectWord.id).all()

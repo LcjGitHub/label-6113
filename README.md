@@ -63,7 +63,7 @@ npm run dev
 
 | 方法 | 路径 | 说明 |
 |------|------|------|
-| GET | `/api/words` | 词条列表，支持 `?region=四川` 按地区筛选、`?keyword=巴适` 关键词模糊匹配（方言词或普通话），两个参数可单独或组合使用 |
+| GET | `/api/words` | 词条列表，支持 `?region=四川` 按地区筛选、`?keyword=巴适` 关键词模糊匹配（方言词、普通话或拼音），两个参数可单独或组合使用 |
 | GET | `/api/words/random` | 随机获取一条词条 |
 | GET | `/api/words/:id` | 词条详情 |
 | POST | `/api/words` | 新增词条 |
@@ -84,7 +84,7 @@ npm run dev
 | 参数 | 类型 | 必填 | 说明 |
 |------|------|------|------|
 | `region` | `string` | 否 | 按地区精确筛选，如 `四川` |
-| `keyword` | `string` | 否 | 关键词模糊匹配，同时作用于「方言词」和「普通话」两个字段 |
+| `keyword` | `string` | 否 | 关键词模糊匹配，同时作用于「方言词」「普通话」和「拼音」三个字段 |
 
 **示例请求**：
 
@@ -112,6 +112,7 @@ GET /api/words?region=四川&keyword=巴适
 | `id` | `number` | 词条 ID |
 | `dialect_word` | `string` | 方言词 |
 | `mandarin` | `string` | 对应普通话释义 |
+| `pinyin` | `string` | 拼音（可能为空字符串） |
 | `region` | `string` | 所属地区 |
 | `example` | `string` | 例句（可能为空字符串） |
 | `source` | `string` | 来源（可能为空字符串） |
@@ -123,6 +124,7 @@ GET /api/words?region=四川&keyword=巴适
   "id": 3,
   "dialect_word": "巴适",
   "mandarin": "舒适、好",
+  "pinyin": "bā shì",
   "region": "四川",
   "example": "这个火锅真巴适！",
   "source": "",
@@ -204,6 +206,7 @@ GET /api/words?region=四川&keyword=巴适
 |------|------|------|------|
 | `dialect_word` | `string` | 是 | 方言词 |
 | `mandarin` | `string` | 是 | 对应普通话 |
+| `pinyin` | `string` | 否 | 拼音，可选字符串 |
 | `region` | `string` | 是 | 地区 |
 | `example` | `string` | 否 | 例句 |
 | `source` | `string` | 否 | 来源 |
