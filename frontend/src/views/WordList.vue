@@ -41,6 +41,19 @@
               :value="tag"
             />
           </el-select>
+          <el-select
+            v-model="sortField"
+            placeholder="排序字段"
+            style="width: 130px"
+            @change="handleSortChange"
+          >
+            <el-option label="编号" value="id" />
+            <el-option label="方言词" value="dialect_word" />
+            <el-option label="地区" value="region" />
+          </el-select>
+          <el-button :icon="sortDirection === 'asc' ? SortUp : SortDown" @click="toggleSortDirection">
+            {{ sortDirection === 'asc' ? '升序' : '降序' }}
+          </el-button>
           <el-button :icon="Refresh" @click="loadWords">刷新</el-button>
           <el-button type="success" :icon="Download" @click="handleExport">导出</el-button>
           <el-button type="primary" :icon="Upload" @click="openImportDialog">导入</el-button>
@@ -133,7 +146,7 @@
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { Delete, Download, Refresh, Search, Upload } from '@element-plus/icons-vue'
+import { Delete, Download, Refresh, Search, SortDown, SortUp, Upload } from '@element-plus/icons-vue'
 import { batchDeleteWords, batchImportWords, deleteWord, exportWords, fetchRegions, fetchTags, fetchWords } from '@/api/words'
 import { useRegionStore } from '@/stores/region'
 import type { DialectWord, Region, WordForm } from '@/types/word'
@@ -149,6 +162,8 @@ const keyword = ref('')
 const selectedTag = ref('')
 const allTags = ref<string[]>([])
 const selectedIds = ref<number[]>([])
+const sortField = ref('id')
+const sortDirection = ref<'asc' | 'desc'>('asc')
 
 const importDialogVisible = ref(false)
 const importJsonText = ref('')
@@ -161,7 +176,9 @@ async function loadWords() {
     const region = regionStore.selectedRegion || undefined
     const kw = keyword.value.trim() || undefined
     const tag = selectedTag.value || undefined
-    words.value = await fetchWords(region, kw, tag)
+    const sf = sortField.value || undefined
+    const sd = sortDirection.value || undefined
+    words.value = await fetchWords(region, kw, tag, sf, sd)
   } catch {
     ElMessage.error('加载词汇列表失败')
   } finally {
@@ -183,6 +200,15 @@ function handleRegionChange() {
 }
 
 function handleTagChange() {
+  loadWords()
+}
+
+function handleSortChange() {
+  loadWords()
+}
+
+function toggleSortDirection() {
+  sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc'
   loadWords()
 }
 

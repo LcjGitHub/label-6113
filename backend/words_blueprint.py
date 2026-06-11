@@ -8,11 +8,20 @@ from models import DialectWord, db
 words_bp = Blueprint("words", __name__, url_prefix="/api/words")
 
 
+SORT_FIELD_MAP = {
+    "id": DialectWord.id,
+    "dialect_word": DialectWord.dialect_word,
+    "region": DialectWord.region,
+}
+
+
 @words_bp.route("", methods=["GET"])
 def list_words():
     region = request.args.get("region", "").strip()
     keyword = request.args.get("keyword", "").strip()
     tag = request.args.get("tag", "").strip()
+    sort_field = request.args.get("sort_field", "id").strip()
+    sort_direction = request.args.get("sort_direction", "asc").strip()
     query = DialectWord.query
     if region:
         query = query.filter(DialectWord.region == region)
@@ -27,7 +36,9 @@ def list_words():
         )
     if tag:
         query = query.filter(db.literal(",").concat(DialectWord.tags).concat(",").like(f"%,{tag},%"))
-    words = query.order_by(DialectWord.id).all()
+    column = SORT_FIELD_MAP.get(sort_field, DialectWord.id)
+    order_col = column.desc() if sort_direction == "desc" else column.asc()
+    words = query.order_by(order_col).all()
     return jsonify([word.to_dict() for word in words])
 
 

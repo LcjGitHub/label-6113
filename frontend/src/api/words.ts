@@ -5,11 +5,13 @@ const api = axios.create({
   baseURL: '/api',
 })
 
-export async function fetchWords(region?: string, keyword?: string, tag?: string): Promise<DialectWord[]> {
+export async function fetchWords(region?: string, keyword?: string, tag?: string, sortField?: string, sortDirection?: string): Promise<DialectWord[]> {
   const params: Record<string, string> = {}
   if (region) params.region = region
   if (keyword) params.keyword = keyword
   if (tag) params.tag = tag
+  if (sortField) params.sort_field = sortField
+  if (sortDirection) params.sort_direction = sortDirection
   const { data } = await api.get<DialectWord[]>('/words', { params })
   return data
 }
