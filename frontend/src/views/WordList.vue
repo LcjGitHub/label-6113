@@ -29,9 +29,9 @@
           </el-select>
           <el-button :icon="Refresh" @click="loadWords">刷新</el-button>
           <el-button
-            v-if="selectedIds.length > 0"
             type="danger"
             :icon="Delete"
+            :disabled="selectedIds.length === 0"
             @click="handleBatchDelete"
           >
             批量删除 ({{ selectedIds.length }})
